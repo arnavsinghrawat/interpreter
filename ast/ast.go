@@ -26,6 +26,7 @@ type Expression interface { // this is a node(expression type) in our AST
 type Program struct { 
 	Statements []Statement
 }
+// the statements slice can hold all the different types of struct that implement statement
 // the above is the root node of our source code 
 
 func (p *Program) TokenLiteral() string {

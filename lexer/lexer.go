@@ -116,7 +116,7 @@ func (l *Lexer) readNumber() string {
 
 func isDigit(ch byte) bool {
 	return '0' <= ch && ch <= '9'
-}
+}//helps in checking if the ch is a digit or not
 
 func (l *Lexer) readIdentifier() string {
 	position := l.position
@@ -129,8 +129,8 @@ func (l *Lexer) readIdentifier() string {
 
 func isLetter(ch byte) bool {
 	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_'
-}
+}//helps in checking if the ch is a character or not
 
 func newToken(tokenType token.TokenType, ch byte) token.Token {
 	return token.Token{Type: tokenType, Literal: string(ch)}
-}
+}//helps creating a new token in the nextToken function
