@@ -125,7 +125,6 @@ func (rs *ReturnStatement) String() string {
 /*
 Can't really give examples in this an many cases
 */
-
 type ExpressionStatement struct {
 	Token      token.Token
 	Expression Expression
@@ -143,7 +142,7 @@ func (es *ExpressionStatement) String() string {
 }
 
 // integer literal
-
+//for numbers like 4,5,3
 type IntegerLiteral struct {
 	Token token.Token
 	Value int64
@@ -158,7 +157,7 @@ func (il *IntegerLiteral) String() string {
 }
 
 // prefix Expression
-
+// example := -3,-7 etc
 type PrefixExpression struct {
 	Token token.Token
 	Operator string
@@ -179,13 +178,14 @@ func (pe *PrefixExpression) String() string {
 }
 
 // infix parsing expression
-
+// eg := 4 + 5, 6 * 8
 type InfixExpression struct {
 	Token token.Token // The operator token, e.g. +
 	Left Expression
 	Operator string
 	Right Expression
 }
+
 func (oe *InfixExpression) expressionNode() {}
 func (oe *InfixExpression) TokenLiteral() string { return oe.Token.Literal }
 func (oe *InfixExpression) String() string {
@@ -197,3 +197,13 @@ func (oe *InfixExpression) String() string {
 	out.WriteString(")")
 	return out.String()
 }
+
+// boolean litrals
+type Boolean struct {
+	Token token.Token
+	Value bool
+}
+
+func (b *Boolean) expressionNode() {}
+func (b *Boolean) TokenLiteral() string { return b.Token.Literal }
+func (b *Boolean) String() string {return b.Token.Literal}
