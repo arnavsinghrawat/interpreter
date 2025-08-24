@@ -6,7 +6,7 @@ import (
 	"monkey/object"
 )
 
-func Eval(node ast.Node) object.Object {
+func Eval(node ast.Node, env *object.Environment) object.Object {
 	switch node := node.(type) {
 	case *ast.Program:
 		return evalProgram(node)
@@ -19,6 +19,9 @@ func Eval(node ast.Node) object.Object {
 
 	case *ast.Boolean:
 		return nativeBoolToBooleanObject(node.Value)
+
+	case *ast.Identifier:
+		return evalIdentifier(node,env)
 
 	case *ast.PrefixExpression:
 		right := Eval(node.Right)
@@ -52,6 +55,13 @@ func Eval(node ast.Node) object.Object {
 			return val
 		}
 		return &object.ReturnValue{Value: val}
+	
+	case *ast.LetStatement:
+		val := Eval(node.Value,env)
+		if isError(val) {
+			return val
+		}
+		env.Set(node.Name.Value,val)
 	}
 
 	return nil
@@ -173,7 +183,7 @@ func evalIfExpression(ie *ast.IfExpression) object.Object {
 	if isError(condition) {
 		return condition
 	}
-	
+
 	if isTruthy(condition) {
 		return Eval(ie.Consequence)
 	} else if ie.Alternative != nil {
@@ -237,4 +247,16 @@ func isError(obj object.Object) bool {
 	}
 
 	return false
+}
+
+
+// binding
+
+func evalIdentifier(node *ast.Identifier, env *object.Environment) object.Object {
+	val, ok := env.Get(node.Value)
+	if !ok {
+		return newError("identifier not found: " + node.Value)
+	}
+
+	return val
 }
