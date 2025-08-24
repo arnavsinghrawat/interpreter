@@ -195,6 +195,21 @@ func (p *Parser) parseExpressionStatment() *ast.ExpressionStatement {
 	return stmt
 }
 
+//Grouped Expression
+
+func (p *Parser) parseGroupedExpression() ast.Expression {
+	p.nextToken()
+
+	exp := p.parseExpression(LOWEST)
+
+	if !p.expectPeek(token.RPAREN) {
+		return nil
+	}
+
+	return exp
+}
+
+
 func (p *Parser) parseExpression(precedence int) ast.Expression {
 	prefix := p.prefixParseFns[p.curToken.Type]
 
@@ -317,20 +332,6 @@ var precedences = map[token.TokenType]int{
 
 func (p *Parser) parseBoolean() ast.Expression {
 	return &ast.Boolean{Token: p.curToken, Value: p.curTokenIs(token.TRUE)}
-}
-
-//Grouped Expression
-
-func (p *Parser) parseGroupedExpression() ast.Expression {
-	p.nextToken()
-
-	exp := p.parseExpression(LOWEST)
-
-	if !p.expectPeek(token.RPAREN) {
-		return nil
-	}
-
-	return exp
 }
 
 // if expression

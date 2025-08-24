@@ -51,6 +51,8 @@ func (p *Program) String() string {
 	return out.String()
 }
 
+//identifiers
+
 type Identifier struct {
 	Token token.Token // the token.IDENT token
 	Value string
@@ -62,6 +64,8 @@ func (i *Identifier) String() string       { return i.Value }
 
 /*
 let x = 5
+
+let <identifier> = <expression>
 
 	LetStatement{
 		Token: Token{Type: LET, Literal: "let"}
@@ -92,7 +96,7 @@ func (ls *LetStatement) String() string {
 	return out.String()
 }
 
-// return statment parsing``
+// return statment parsing
 
 /*
 return 5;
