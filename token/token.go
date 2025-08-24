@@ -19,6 +19,7 @@ const (
 	//Identifirers+ literals
 	IDENT = "IDENT"
 	INT   = "INT"
+	STRING = "STRING"
 
 	//Operators
 	ASSIGN   = "="
