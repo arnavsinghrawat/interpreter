@@ -10,13 +10,15 @@ import (
 type ObjectType string
 
 const (
-	INTEGER_OBJ = "INTEGER"
-	BOOLEA_OBJ  = "BOOLEAN"
-	NULL_OBJ    = "NULL"
+	INTEGER_OBJ      = "INTEGER"
+	BOOLEA_OBJ       = "BOOLEAN"
+	NULL_OBJ         = "NULL"
 	RETURN_VALUE_OBJ = "RETURN_VALUE"
-	ERROR_OBJ = "ERROR"
-	FUNCTION_OBJ = "FUNCTION"
-	STRING_OBJ = "STRING"
+	ERROR_OBJ        = "ERROR"
+	FUNCTION_OBJ     = "FUNCTION"
+	STRING_OBJ       = "STRING"
+	BUILTIN_OBJ      = "BUILTIN"
+	ARRAY_OBJ        = "ARRAY"
 )
 
 type Object interface {
@@ -43,21 +45,21 @@ type Null struct{}
 func (n *Null) Type() ObjectType { return NULL_OBJ }
 func (n *Null) Inspect() string  { return "null" }
 
-//return type
+// return type
 type ReturnValue struct {
 	Value Object
 }
 
-func (rv *ReturnValue) Type() ObjectType {return RETURN_VALUE_OBJ}
-func (rv *ReturnValue) Inspect() string {return rv.Value.Inspect()}
+func (rv *ReturnValue) Type() ObjectType { return RETURN_VALUE_OBJ }
+func (rv *ReturnValue) Inspect() string  { return rv.Value.Inspect() }
 
-// error object 
+// error object
 type Error struct {
 	Message string
 }
 
-func (e *Error) Type() ObjectType {return ERROR_OBJ}
-func (e *Error) Inspect() string {return "ERROR: " + e.Message}
+func (e *Error) Type() ObjectType { return ERROR_OBJ }
+func (e *Error) Inspect() string  { return "ERROR: " + e.Message }
 
 // binding variables to their values
 func NewEnvironment() *Environment {
@@ -66,11 +68,11 @@ func NewEnvironment() *Environment {
 }
 
 // for giving new environment for functions due to arguments and block
-func NewEnclosedEnvironment(outer *Environment) *Environment{
+func NewEnclosedEnvironment(outer *Environment) *Environment {
 	env := NewEnvironment()
 	env.outer = outer
 	return env
-} 
+}
 
 type Environment struct {
 	store map[string]Object
@@ -80,7 +82,7 @@ type Environment struct {
 func (e *Environment) Get(name string) (Object, bool) {
 	obj, ok := e.store[name]
 
-	if !ok && e.outer != nil{
+	if !ok && e.outer != nil {
 		obj, ok = e.outer.Get(name)
 	}
 
@@ -92,15 +94,14 @@ func (e *Environment) Set(name string, val Object) Object {
 	return val
 }
 
-
 // implementation and binding of functions
 type Function struct {
 	Parameters []*ast.Identifier
-	Body *ast.BlockStatement
-	Env *Environment
+	Body       *ast.BlockStatement
+	Env        *Environment
 }
 
-func (f *Function) Type() ObjectType {return FUNCTION_OBJ}
+func (f *Function) Type() ObjectType { return FUNCTION_OBJ }
 func (f *Function) Inspect() string {
 	var out bytes.Buffer
 
@@ -125,7 +126,32 @@ type String struct {
 }
 
 func (s *String) Type() ObjectType { return STRING_OBJ }
-func (s *String) Inspect() string { return s.Value }
+func (s *String) Inspect() string  { return s.Value }
 
+// built in functions implementation
+type BuiltinFunction func(args ...Object) Object
 
+type Builtin struct {
+	Fn BuiltinFunction
+}
 
+func (b *Builtin) Type() ObjectType { return BUILTIN_OBJ }
+func (b *Builtin) Inspect() string  { return "builtin function" }
+
+// for indexing of arrays
+type Array struct {
+	Elements []Object
+}
+
+func (ao *Array) Type() ObjectType { return ARRAY_OBJ }
+func (ao *Array) Inspect() string {
+	var out bytes.Buffer
+	elements := []string{}
+	for _, e := range ao.Elements {
+		elements = append(elements, e.Inspect())
+	}
+	out.WriteString("[")
+	out.WriteString(strings.Join(elements, ", "))
+	out.WriteString("]")
+	return out.String()
+}
