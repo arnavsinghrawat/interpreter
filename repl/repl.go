@@ -41,6 +41,7 @@ func Start(in io.Reader, out io.Writer) {
 	}
 }
 
+// function to format writing out errors
 func printParseErrors(out io.Writer, errors []string) {
 	io.WriteString(out,"Error is detected\n")
 	io.WriteString(out,"parser errors:\n")

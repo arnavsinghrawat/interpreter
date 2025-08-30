@@ -24,13 +24,16 @@ type Parser struct {
 	infixParseFns  map[token.TokenType]infixParseFn
 }
 
+// function to map a function to a particular token
 func (p *Parser) registerPrefix(tokenType token.TokenType, fn prefixParserFn) {
 	p.prefixParseFns[tokenType] = fn
 }
 
+// function to map a function to a particular token
 func (p *Parser) registerInfix(tokenType token.TokenType, fn infixParseFn) {
 	p.infixParseFns[tokenType] = fn
 }
+
 
 func New(l *lexer.Lexer) *Parser {
 	p := &Parser{
@@ -73,15 +76,18 @@ func New(l *lexer.Lexer) *Parser {
 	return p
 }
 
+// return slice of errors
 func (p *Parser) Errors() []string {
 	return p.errors
 }
 
+// adds a string which displays the type which was expected(according to the parameter) to the parser's errorr slice
 func (p *Parser) peekError(t token.TokenType) {
 	msg := fmt.Sprintf("expected next token to be %s, got %s instead", t, p.peekToken.Type)
 	p.errors = append(p.errors, msg)
 }
 
+// returns a boolean value after checking if the next token is as expected(according to the parameter)
 func (p *Parser) expectPeek(t token.TokenType) bool {
 	if p.peekTokenIs(t) {
 		p.nextToken()
@@ -92,15 +98,13 @@ func (p *Parser) expectPeek(t token.TokenType) bool {
 	}
 }
 
+// increments parser's curtoken and parser's peektoken
 func (p *Parser) nextToken() {
 	p.curToken = p.peekToken
 	p.peekToken = p.l.NextToken()
 }
 
-// func (p *Parser) ParserProgram() *ast.Program {
-// 	return nil
-// }
-
+//
 func (p *Parser) ParseProgram() *ast.Program {
 	program := &ast.Program{}
 	program.Statements = []ast.Statement{}
@@ -116,6 +120,7 @@ func (p *Parser) ParseProgram() *ast.Program {
 	return program
 }
 
+// switch statement to give back the 
 func (p *Parser) parseStatement() ast.Statement {
 	switch p.curToken.Type {
 	case token.LET:
@@ -128,7 +133,6 @@ func (p *Parser) parseStatement() ast.Statement {
 }
 
 // let statment parsing
-
 func (p *Parser) parseLetStatement() ast.Statement {
 	stmt := &ast.LetStatement{Token: p.curToken}
 
@@ -164,7 +168,6 @@ func (p *Parser) peekTokenIs(t token.TokenType) bool {
 }
 
 //return statement
-
 func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 
 	stmt := &ast.ReturnStatement{Token: p.curToken}
@@ -199,7 +202,6 @@ func (p *Parser) parseExpressionStatment() *ast.ExpressionStatement {
 }
 
 //Grouped Expression
-
 func (p *Parser) parseGroupedExpression() ast.Expression {
 	p.nextToken()
 

@@ -9,12 +9,16 @@ type Lexer struct {
 	ch           byte
 }
 
+//initiates the Lexer puts the position at 0th pos and readPos at 1st pos
 func New(input string) *Lexer {
 	l := &Lexer{input: input}
+	// readPos = 0 &&  position = 0 
 	l.readChar()
+	// now readPos = 1 && position = 1
 	return l
 }
 
+// returns the byte at readPos's postion in l.input
 func (l *Lexer) peekChar() byte {
 	if l.readPosition >= len(l.input) {
 		return 0
@@ -23,6 +27,7 @@ func (l *Lexer) peekChar() byte {
 	}
 }
 
+// increments both l.readPos and l.position
 func (l *Lexer) readChar() {
 	if l.readPosition >= len(l.input) {
 		l.ch = 0
@@ -33,12 +38,14 @@ func (l *Lexer) readChar() {
 	l.readPosition += 1
 }
 
+// skips whitespaces
 func (l *Lexer) skipWhitespace() {
 	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
 		l.readChar()
 	}
 }
 
+// function to identify the current charater/(string of characters) and assign this entity with the appropriate token 
 func (l *Lexer) NextToken() token.Token {
 	var tok token.Token
 
@@ -94,7 +101,7 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newToken(token.RBRACKET, l.ch)
 	case ':':
 		tok = newToken(token.COLON, l.ch)
-	case 0:
+	case 0: // for end of line/file
 		tok.Literal = ""
 		tok.Type = token.EOF
 	default:
@@ -114,6 +121,7 @@ func (l *Lexer) NextToken() token.Token {
 	return tok
 }
 
+// returns the number
 func (l *Lexer) readNumber() string {
 	position := l.position
 	for isDigit(l.ch) {
@@ -123,10 +131,12 @@ func (l *Lexer) readNumber() string {
 	return l.input[position:l.position]
 }
 
+//returns bool value to check whether the current char is a bool
 func isDigit(ch byte) bool {
 	return '0' <= ch && ch <= '9'
-} //helps in checking if the ch is a digit or not
+} 
 
+//return the identifier by reading the string(input)
 func (l *Lexer) readIdentifier() string {
 	position := l.position
 	for isLetter(l.ch) {
@@ -136,13 +146,15 @@ func (l *Lexer) readIdentifier() string {
 	return l.input[position:l.position]
 }
 
+//returns checking if the ch is a character or not
 func isLetter(ch byte) bool {
 	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_'
-} //helps in checking if the ch is a character or not
+} 
 
+// return a new token according to a parameters
 func newToken(tokenType token.TokenType, ch byte) token.Token {
 	return token.Token{Type: tokenType, Literal: string(ch)}
-} //helps creating a new token in the nextToken function
+}
 
 // function to read string
 func (l *Lexer) readString() string {

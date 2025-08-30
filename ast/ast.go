@@ -6,33 +6,32 @@ import (
 	"strings"
 )
 
-type Node interface { // this is a node in our AST
-	TokenLiteral() string
-	String() string
+// interface for a node in our AST
+type Node interface { 
+	TokenLiteral() string // returns at actual litral of the node(from the token refering to this node)
+	String() string // return the semantic value of the node
 }
 
-type Statement interface { // this is a node(statement type) in our AST
+// interface for a statement nodes
+type Statement interface { 
 	Node
 	statementNode()
 }
 
-// this is an example of embedded interfaces what it basically says is that any struct implementing
-// Statment should also implement Node and should also have one more function statmentNode
-// (this function is called marker function see how it is not returning anything it is bascially there to make Go's typing system distinguish between Statemnt interface and Expression interface)
-
-type Expression interface { // this is a node(expression type) in our AST
+// interface for an expression nodes
+type Expression interface {
 	Node
 	expressionNode()
 }
 
-// first implementation of a node
+// root node of our AST
 type Program struct {
 	Statements []Statement
 }
 
 // the statements slice can hold all the different types of struct that implement statement
-// the above is the root node of our source code
 
+// returns the tokenLiteralFunctions of the nodes(that implement statement) in statments[]
 func (p *Program) TokenLiteral() string {
 	if len(p.Statements) > 0 {
 		return p.Statements[0].TokenLiteral()
@@ -41,6 +40,7 @@ func (p *Program) TokenLiteral() string {
 	}
 }
 
+// returns a string that comprises of the (return of String() methods) for the each node(that implements the Statement node) in the Statements slice
 func (p *Program) String() string {
 	var out bytes.Buffer
 
@@ -51,8 +51,8 @@ func (p *Program) String() string {
 	return out.String()
 }
 
-//identifiers
 
+// node to represent a identifier(Implements Expression interface)
 type Identifier struct {
 	Token token.Token // the token.IDENT token
 	Value string
@@ -72,6 +72,8 @@ let <identifier> = <expression>
 		Name: Identifier{Value: "x" and also the Token}
 		Value: in the above case 5
 */
+
+// node for let statment (Implments Statment interface)
 type LetStatement struct {
 	Token token.Token // the token.LET token
 	Name  *Identifier
@@ -79,8 +81,9 @@ type LetStatement struct {
 }
 
 func (ls *LetStatement) statementNode()       {}
-func (ls *LetStatement) TokenLiteral() string { return ls.Token.Literal }
+func (ls *LetStatement) TokenLiteral() string { return ls.Token.Literal } // returns token literal in this case --> let
 
+//return a string which give out --> "let (name of var) = (expression);"
 func (ls *LetStatement) String() string {
 	var out bytes.Buffer
 
@@ -97,7 +100,6 @@ func (ls *LetStatement) String() string {
 }
 
 // return statment parsing
-
 /*
 return 5;
 return 10;
@@ -106,15 +108,19 @@ return add(15);
 
 // return <expression>;
 
+// node for return statement (Implments Statment interface)
 type ReturnStatement struct {
 	Token       token.Token
 	ReturnValue Expression
 }
 
 func (rs *ReturnStatement) statementNode() {}
+// function returns the token literal which in this case is --> return
 func (rs *ReturnStatement) TokenLiteral() string {
 	return rs.Token.Literal
 }
+
+// returns a string which in this case gives out --> "return expression;"
 func (rs *ReturnStatement) String() string {
 	var out bytes.Buffer
 	out.WriteString(rs.TokenLiteral() + " ")
@@ -124,12 +130,16 @@ func (rs *ReturnStatement) String() string {
 	out.WriteString(";")
 	return out.String()
 }
-
 // expression statements
 
 /*
-Can't really give examples in this an many cases
+Examples:-
+
+	Factorial(20);
+	x + 4;  (given that x is assigned to value)
 */
+
+// node for expressions in our ast(implments statment node)
 type ExpressionStatement struct {
 	Token      token.Token
 	Expression Expression
@@ -146,8 +156,22 @@ func (es *ExpressionStatement) String() string {
 	return ""
 }
 
+/*
+Example for x + 4
+ExpressionStatement{
+    Token:      token.Token{Type: IDENT, Literal: "x"}, // first token of expr
+    Expression: &InfixExpression{
+        Left:     &Identifier{Token: token.Token{Type: IDENT, Literal: "x"}, Value: "x"},
+        Operator: "+",
+        Right:    &IntegerLiteral{Token: token.Token{Type: INT, Literal: "10"}, Value: 10},
+    },
+}
+*/
+
 // integer literal
 // for numbers like 4,5,3
+
+// node for interger expressions in our ast
 type IntegerLiteral struct {
 	Token token.Token
 	Value int64
@@ -163,6 +187,8 @@ func (il *IntegerLiteral) String() string {
 
 // prefix Expression
 // example := -3,-7 etc
+
+// node for prefix expressions in our ast
 type PrefixExpression struct {
 	Token    token.Token
 	Operator string
@@ -184,6 +210,8 @@ func (pe *PrefixExpression) String() string {
 
 // infix parsing expression
 // eg := 4 + 5, 6 * 8
+
+// node for infix interger expressions in our ast
 type InfixExpression struct {
 	Token    token.Token // The operator token, e.g. +
 	Left     Expression
@@ -203,7 +231,7 @@ func (oe *InfixExpression) String() string {
 	return out.String()
 }
 
-// boolean litrals
+// node for boolean expressions in our ast
 type Boolean struct {
 	Token token.Token
 	Value bool
@@ -217,7 +245,7 @@ func (b *Boolean) String() string       { return b.Token.Literal }
 /*
 if (<condition>) <consequence> else <alternative>
 */
-
+// node for if expressions in our ast
 type IfExpression struct {
 	Token       token.Token
 	Condition   Expression
@@ -243,6 +271,7 @@ func (ie *IfExpression) String() string {
 	return out.String()
 }
 
+// node for bolck statement in our ast
 type BlockStatement struct {
 	Token      token.Token
 	Statements []Statement
@@ -267,9 +296,9 @@ return x + y;
 structure:-
 fn <parameters> <block statement>
 */
-
+// node for function definition(Implements Expression node)
 type FunctionLiteral struct {
-	Token      token.Token
+	Token      token.Token // would be "fn"
 	Parameters []*Identifier
 	Body       *BlockStatement
 }
@@ -299,9 +328,9 @@ func (fl *FunctionLiteral) String() string {
 /*
 <expression>(<comma separated expressions>)
 */
-
+// node for call expression
 type CallExpression struct {
-	Token     token.Token
+	Token     token.Token // would be "("
 	Function  Expression
 	Arguments []Expression
 }
@@ -321,9 +350,9 @@ func (ce *CallExpression) String() string {
 	return out.String()
 }
 
-// Node for the string
+// Node for the string (implements expression node)
 type StringLiteral struct {
-	Token token.Token
+	Token token.Token // would be "
 	Value string
 }
 
@@ -332,9 +361,8 @@ func (sl *StringLiteral) TokenLiteral() string { return sl.Token.Literal }
 func (sl *StringLiteral) String() string       { return sl.Token.Literal }
 
 // adding arrays
-
 type ArrayLiteral struct {
-	Token    token.Token
+	Token    token.Token // would be [
 	Elements []Expression
 }
 
@@ -352,9 +380,9 @@ func (al *ArrayLiteral) String() string {
 	return out.String()
 }
 
-// indexing of array literals
+// node for indexing of array literals (implements expression node)
 type IndexExpression struct {
-	Token token.Token
+	Token token.Token // would be [
 	Left  Expression
 	Index Expression
 }
@@ -376,6 +404,7 @@ func (ie *IndexExpression) String() string {
 // hash map
 // {<expression> : <expression>, <expression> : <expression>, ... }
 
+// node for hash map in golang(implements Expression node)
 type HashLiteral struct {
 	Token token.Token // the '{' token
 	Pairs map[Expression]Expression
@@ -394,5 +423,3 @@ func (hl *HashLiteral) String() string {
 	out.WriteString("}")
 	return out.String()
 }
-
-
