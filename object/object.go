@@ -10,6 +10,7 @@ import (
 
 type ObjectType string
 
+// all the objects in our tree walking evaluator
 const (
 	INTEGER_OBJ      = "INTEGER"
 	BOOLEA_OBJ       = "BOOLEAN"
@@ -23,11 +24,13 @@ const (
 	HASH_OBJ         = "HASH"
 )
 
+// Interface for objects
 type Object interface {
-	Type() ObjectType
-	Inspect() string
+	Type() ObjectType // Returns the Value of the Objects
+	Inspect() string  // Prints the type of object(from the list of constants)
 }
 
+// Integer object
 type Integer struct {
 	Value int64
 }
@@ -35,6 +38,7 @@ type Integer struct {
 func (i *Integer) Inspect() string  { return fmt.Sprintf("%d", i.Value) }
 func (i *Integer) Type() ObjectType { return INTEGER_OBJ }
 
+// Boolean Object
 type Boolean struct {
 	Value bool
 }
@@ -42,12 +46,13 @@ type Boolean struct {
 func (b *Boolean) Type() ObjectType { return BOOLEA_OBJ }
 func (b *Boolean) Inspect() string  { return fmt.Sprintf("%t", b.Value) }
 
+// Null object
 type Null struct{}
 
 func (n *Null) Type() ObjectType { return NULL_OBJ }
 func (n *Null) Inspect() string  { return "null" }
 
-// return type
+// Return object
 type ReturnValue struct {
 	Value Object
 }
@@ -55,7 +60,7 @@ type ReturnValue struct {
 func (rv *ReturnValue) Type() ObjectType { return RETURN_VALUE_OBJ }
 func (rv *ReturnValue) Inspect() string  { return rv.Value.Inspect() }
 
-// error object
+// Error object
 type Error struct {
 	Message string
 }
@@ -63,7 +68,7 @@ type Error struct {
 func (e *Error) Type() ObjectType { return ERROR_OBJ }
 func (e *Error) Inspect() string  { return "ERROR: " + e.Message }
 
-// binding variables to their values
+// returns a new pointer of Environment for 'storing references
 func NewEnvironment() *Environment {
 	s := make(map[string]Object)
 	return &Environment{store: s, outer: nil}
@@ -76,11 +81,13 @@ func NewEnclosedEnvironment(outer *Environment) *Environment {
 	return env
 }
 
+// object for environment
 type Environment struct {
 	store map[string]Object
 	outer *Environment
 }
 
+// Returns the corresponding value for a variable
 func (e *Environment) Get(name string) (Object, bool) {
 	obj, ok := e.store[name]
 
@@ -91,12 +98,13 @@ func (e *Environment) Get(name string) (Object, bool) {
 	return obj, ok
 }
 
+// Set the mapping between a variable and value for a Environment
 func (e *Environment) Set(name string, val Object) Object {
 	e.store[name] = val
 	return val
 }
 
-// implementation and binding of functions
+// Object for Function
 type Function struct {
 	Parameters []*ast.Identifier
 	Body       *ast.BlockStatement
@@ -122,7 +130,7 @@ func (f *Function) Inspect() string {
 	return out.String()
 }
 
-// string objects
+// Object for String
 type String struct {
 	Value string
 }
@@ -133,6 +141,7 @@ func (s *String) Inspect() string  { return s.Value }
 // built in functions implementation
 type BuiltinFunction func(args ...Object) Object
 
+// Object for Builtin functions
 type Builtin struct {
 	Fn BuiltinFunction
 }
@@ -159,7 +168,6 @@ func (ao *Array) Inspect() string {
 }
 
 //creating hashmaps keys structures
-
 type HashKey struct {
 	Type  ObjectType
 	Value uint64
