@@ -1,82 +1,169 @@
-# Interpreter Project
+# Custom Programming language interpreter
 
-## Packages
+A complete interpreter for a custom programming language, written in Go. This interpreter implements a full programming language including lexing, parsing, and evaluation of code. This interpreter is made with the help of the book Writing An Interpreter In Go-Thorsten Ball.
 
-### 1. Token
-These are the tokens that are recieved from the source code using a lexer. In this package the structure and types of token are defined.
+## Overview
 
-Token : {
-    1. Type of Token(uses Type as a tokenType which is a string underhood) --> string
-    2. The literal of the token --> string
-}
+The Monkey programming language is a small, interpreted language that supports:
+- Variable bindings
+- Integers and booleans
+- Arithmetic expressions
+- Built-in functions
+- First-class and higher-order functions
+- Closures
+- String data structure
+- Array data structure
+- Hash data structure
 
-example: let x = 5;
-x is a token of type IDENT and literal is 'x'
+## Project Structure
 
-There are also a few constant described for the types of token and a map to map them from literal to their type but only for few tokens like fn,let etc.
+### Core Components
 
-To use the the map getIdentifier function is used.
+1. **Token (`/token`)** 
+   - Defines all tokens used in the language
+   - Implements token types and structures
+   - Handles keyword identification
 
-### 2. Lexer
-In the token package we just define a token whereas in the lexer package we are going to define functions that read the source code and help create those tokens on the basis of the source code.
+2. **Lexer (`/lexer`)**
+   - Performs lexical analysis
+   - Converts source code into tokens
+   - Handles character-by-character processing
+   - Manages whitespace and comments
 
-Lexer : {
-    1. There is the input which is the source code (or a line of the source code) --> string
-    2. position (consider this index of the input string) --> int
-    3. readPosition is the next index to the position and helps us determining the type of token we have to create. --> int
-    4. ch this is the character under the postion index --> byte
-}
+3. **Abstract Syntax Tree (`/ast`)**
+   - Defines the structure for parsed code
+   - Implements nodes for:
+     - Expressions
+     - Statements
+     - Identifiers
+     - Literals
 
-#### Function in lexer
-1. peekChar() --> gives us the character at the readPosition
+4. **Parser (`/parser`)**
+   - Converts tokens into an AST
+   - Implements Pratt parsing
+   - Handles:
+     - Prefix expressions
+     - Infix expressions
+     - Grouped expressions
+     - IF expressions
+     - Function literals
 
-2. readChar() --> makes the ch equal to the character at readPostion and increments the postion and readPosition character
+5. **Object System (`/object`)**
+   - Defines internal object system
+   - Implements:
+     - Integer objects
+     - Boolean objects
+     - String objects
+     - Array objects
+     - Hash objects
+     - Function objects
+     - Return values
+     - Error handling
 
-3. skipWhiteSpace() --> since in monkey language spaces hold not significance therefore we need to skips characters like spaces, tabs and etc.
+6. **Evaluator (`/evaluator`)**
+   - Executes the parsed AST
+   - Implements:
+     - Expression evaluation
+     - Built-in functions
+     - Error handling
+     - Environment management
 
-4.  nextToken() --> we take the current l.ch under consideration and use a switch stament to create the correct type of token and return that token
+7. **REPL (`/repl`)**
+   - Provides interactive shell
+   - Read-Eval-Print Loop implementation
 
-5. readNumber() --> use for reading numbers(specially useful when number is bigger than one ccharacter like "9834")
+## Language Features
 
-6. readIdentifier() --> reads identifier
+### 1. Variable Bindings
+```monkey
+let age = 1;
+let name = "Monkey";
+let result = 10 * (20 / 2);
+```
 
-### 3. AST
-After being done with the tokenization of the source code we need to need create a abtract syntax tree for the tokens that we have created
+### 2. Functions and Closures
+```monkey
+let fibonacci = fn(x) {
+    if (x < 2) { return x; }
+    return fibonacci(x - 1) + fibonacci(x - 2);
+};
+```
 
-#### Interfaces in AST
-1. Node: {
-    1. tokenLiteral() --> gives string(helps in finding the error)
-}
+### 3. Arrays and Built-in Functions
+```monkey
+let myArray = [1, 2, 3, 4, 5];
+let length = len(myArray);
+let first = first(myArray);
+let last = last(myArray);
+```
 
-2. Statement: {
-    1. Implements all the functions of the Node interface
-    2. statementNode()
-}
+### 4. Hash Maps
+```monkey
+let prices = {"apple": 5, "banana": 3};
+prices["apple"]
+```
 
-3. Expression: {
-    1. Implements all the functions of the Node interface
-    2. expressionNode()
-}
+### 5. Built-in Functions
+- `len()`: Returns length of strings and arrays
+- `first()`: Returns first element of array
+- `last()`: Returns last element of array
+- `rest()`: Returns array without first element
+- `push()`: Adds element to array
+- `puts()`: Prints arguments to console
 
-#### Structs in AST
-1. Program: {
-    1. Statments array: {
-        1. this is a basically a slice of all the struct that implement struct (the code is basically a series of statments)
-    }
-}
+## Running the Interpreter
 
-2. LetStatment:{
-    1. token.Token
-    2. indentifier(*Identifier)
-    3. value(Expression)
-    }  
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd monkey
+```
 
-3. Identifier :{
-    1. token.Token
-    2. Value --> this will be a string
-}
+2. Build the interpreter:
+```bash
+go build
+```
 
+3. Run the REPL:
+```bash
+go run main.go
+```
 
-//function to be added
+## Testing
 
-### 4. Parser
+Run the test suite:
+```bash
+go test ./...
+```
+
+## Implementation Details
+
+### Lexical Analysis
+- Character-by-character scanning
+- Token identification
+- Handling of identifiers, numbers, and operators
+
+### Parsing
+- Recursive descent parsing
+- Pratt parsing for expressions
+- Operator precedence handling
+- Error recovery and reporting
+
+### Evaluation
+- Tree-walking interpreter
+- Environment-based scope handling
+- Built-in function implementation
+- Error handling and propagation
+
+## Contributing
+
+Feel free to contribute by:
+1. Forking the repository
+2. Creating your feature branch
+3. Committing your changes
+4. Pushing to the branch
+5. Creating a Pull Request
+
+## License
+
+This project is open source and available under the [MIT License].
