@@ -4,7 +4,7 @@ A complete interpreter for a custom programming language, written in Go. This in
 
 ## Overview
 
-The Monkey programming language is a small, interpreted language that supports:
+The Custom programming language is a small, interpreted language that supports:
 - Variable bindings
 - Integers and booleans
 - Arithmetic expressions
@@ -75,14 +75,14 @@ The Monkey programming language is a small, interpreted language that supports:
 ## Language Features
 
 ### 1. Variable Bindings
-```monkey
+'''
 let age = 1;
-let name = "Monkey";
+let name = "Harsh";
 let result = 10 * (20 / 2);
 ```
 
 ### 2. Functions and Closures
-```monkey
+```
 let fibonacci = fn(x) {
     if (x < 2) { return x; }
     return fibonacci(x - 1) + fibonacci(x - 2);
@@ -90,7 +90,7 @@ let fibonacci = fn(x) {
 ```
 
 ### 3. Arrays and Built-in Functions
-```monkey
+```
 let myArray = [1, 2, 3, 4, 5];
 let length = len(myArray);
 let first = first(myArray);
@@ -98,7 +98,7 @@ let last = last(myArray);
 ```
 
 ### 4. Hash Maps
-```monkey
+```
 let prices = {"apple": 5, "banana": 3};
 prices["apple"]
 ```
@@ -116,7 +116,7 @@ prices["apple"]
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd monkey
+cd
 ```
 
 2. Build the interpreter:
