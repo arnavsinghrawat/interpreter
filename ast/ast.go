@@ -7,13 +7,13 @@ import (
 )
 
 // interface for a node in our AST
-type Node interface { 
+type Node interface {
 	TokenLiteral() string // returns at actual litral of the node(from the token refering to this node)
-	String() string // return the semantic value of the node
+	String() string       // return the semantic value of the node
 }
 
 // interface for a statement nodes
-type Statement interface { 
+type Statement interface {
 	Node
 	statementNode()
 }
@@ -51,7 +51,6 @@ func (p *Program) String() string {
 	return out.String()
 }
 
-
 // node to represent a identifier(Implements Expression interface)
 type Identifier struct {
 	Token token.Token // the token.IDENT token
@@ -83,7 +82,7 @@ type LetStatement struct {
 func (ls *LetStatement) statementNode()       {}
 func (ls *LetStatement) TokenLiteral() string { return ls.Token.Literal } // returns token literal in this case --> let
 
-//return a string which give out --> "let (name of var) = (expression);"
+// return a string which give out --> "let (name of var) = (expression);"
 func (ls *LetStatement) String() string {
 	var out bytes.Buffer
 
@@ -115,6 +114,7 @@ type ReturnStatement struct {
 }
 
 func (rs *ReturnStatement) statementNode() {}
+
 // function returns the token literal which in this case is --> return
 func (rs *ReturnStatement) TokenLiteral() string {
 	return rs.Token.Literal
@@ -130,6 +130,7 @@ func (rs *ReturnStatement) String() string {
 	out.WriteString(";")
 	return out.String()
 }
+
 // expression statements
 
 /*
@@ -421,5 +422,30 @@ func (hl *HashLiteral) String() string {
 	out.WriteString("{")
 	out.WriteString(strings.Join(pairs, ", "))
 	out.WriteString("}")
+	return out.String()
+}
+
+// node for while statement
+type WhileStatement struct {
+	Token     token.Token // The 'while' token
+	Condition Expression
+	Body      *BlockStatement
+}
+
+func (we *WhileStatement) statementNode() {}
+
+// TokenLiteral for WhileStatement
+func (we *WhileStatement) TokenLiteral() string {
+	return we.Token.Literal
+}
+
+func (we *WhileStatement) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("while")
+	out.WriteString(we.Condition.String())
+	out.WriteString(" ")
+	out.WriteString(we.Body.String())
+
 	return out.String()
 }

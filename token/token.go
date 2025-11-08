@@ -4,7 +4,7 @@ type TokenType string
 
 type Token struct {
 	Type    TokenType // name of the token
-	Literal string // actual literal the token
+	Literal string    // actual literal the token
 }
 
 const (
@@ -17,8 +17,8 @@ const (
 	EOF     = "EOF"     // To signify "end of line"
 
 	//Identifirers+ literals
-	IDENT = "IDENT"
-	INT   = "INT"
+	IDENT  = "IDENT"
+	INT    = "INT"
 	STRING = "STRING"
 
 	//Operators
@@ -35,12 +35,12 @@ const (
 	//Delimiters
 	COMMA     = ","
 	SEMICOLON = ";"
-	COLON = ":"
+	COLON     = ":"
 
-	LPAREN = "("
-	RPAREN = ")"
-	LBRACE = "{"
-	RBRACE = "}"
+	LPAREN   = "("
+	RPAREN   = ")"
+	LBRACE   = "{"
+	RBRACE   = "}"
 	LBRACKET = "["
 	RBRACKET = "]"
 
@@ -52,6 +52,7 @@ const (
 	IF       = "IF"
 	ELSE     = "ELSE"
 	RETURN   = "RETURN"
+	WHILE    = "WHILE" // added for the while loop
 )
 
 var keywords = map[string]TokenType{
@@ -62,6 +63,7 @@ var keywords = map[string]TokenType{
 	"if":     IF,
 	"else":   ELSE,
 	"return": RETURN,
+	"while":  WHILE,
 }
 
 func GetIdentfierType(ident string) TokenType {
