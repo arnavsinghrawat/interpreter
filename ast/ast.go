@@ -427,14 +427,13 @@ func (hl *HashLiteral) String() string {
 
 // node for while statement
 type WhileStatement struct {
-	Token     token.Token // The 'while' token
+	Token     token.Token
 	Condition Expression
 	Body      *BlockStatement
 }
 
 func (we *WhileStatement) statementNode() {}
 
-// TokenLiteral for WhileStatement
 func (we *WhileStatement) TokenLiteral() string {
 	return we.Token.Literal
 }
