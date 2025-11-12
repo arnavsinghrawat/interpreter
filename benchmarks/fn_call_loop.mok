@@ -1,0 +1,6 @@
+let inc = fn(x) { x + 1 };
+let i = 0;
+while (i < 2000023) {
+  let i = inc(i);
+}
+i

@@ -1,0 +1,9 @@
+let i = 0;
+let sum = 0;
+
+while (i < 1000456) {
+  let sum = sum + i;
+  let i = i + 1;
+}
+
+sum

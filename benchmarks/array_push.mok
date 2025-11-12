@@ -1,0 +1,7 @@
+let a = [];
+let i = 0;
+while (i < 40000) {
+  let a = push(a, i);
+  let i = i + 1;
+}
+len(a)
